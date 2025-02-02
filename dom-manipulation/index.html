@@ -20,7 +20,8 @@
         margin: 5px;
         cursor: pointer;
       }
-      input {
+      input,
+      select {
         padding: 10px;
         margin: 5px;
         width: 200px;
@@ -38,6 +39,11 @@
     <button id="exportQuotes">Export Quotes to JSON</button>
     <label for="importFile">Import Quotes from JSON</label>
     <input type="file" id="importFile" accept=".json" />
+    <label for="categoryFilter">Filter by Category:</label>
+    <select id="categoryFilter">
+      <option value="all">All Categories</option>
+      <!-- Categories will be populated dynamically -->
+    </select>
 
     <script src="script.js"></script>
   </body>
