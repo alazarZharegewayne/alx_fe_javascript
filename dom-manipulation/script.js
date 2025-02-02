@@ -17,6 +17,22 @@ function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
 }
 
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await response.json();
+    const fetchedQuotes = data
+      .slice(0, 5)
+      .map((post) => ({ text: post.title, category: "General" }));
+    quotes.push(...fetchedQuotes);
+    saveQuotes();
+    populateCategories();
+    showRandomQuote();
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+  }
+}
+
 function showRandomQuote() {
   const quoteDisplay = document.getElementById("quoteDisplay");
   if (quotes.length === 0) {
@@ -77,40 +93,6 @@ function addQuote() {
   showRandomQuote();
 }
 
-function exportToJsonFile() {
-  const dataStr = JSON.stringify(quotes, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "quotes.json";
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function importFromJsonFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const fileReader = new FileReader();
-  fileReader.onload = function (event) {
-    try {
-      const importedQuotes = JSON.parse(event.target.result);
-      if (!Array.isArray(importedQuotes)) {
-        throw new Error("Invalid JSON format. Expected an array of quotes.");
-      }
-      quotes.push(...importedQuotes);
-      saveQuotes();
-      populateCategories();
-      alert("Quotes imported successfully!");
-      showRandomQuote();
-    } catch (error) {
-      alert("Error importing quotes: " + error.message);
-    }
-  };
-  fileReader.readAsText(file);
-}
-
 function populateCategories() {
   const categoryFilter = document.getElementById("categoryFilter");
   const categories = [...new Set(quotes.map((quote) => quote.category))];
@@ -122,7 +104,6 @@ function populateCategories() {
     categoryFilter.appendChild(option);
   });
 
-  // Restore the last selected filter
   const lastFilter = localStorage.getItem("lastSelectedFilter");
   if (lastFilter) {
     categoryFilter.value = lastFilter;
@@ -151,16 +132,11 @@ function filterQuotes() {
 
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document
-  .getElementById("exportQuotes")
-  .addEventListener("click", exportToJsonFile);
-document
-  .getElementById("importFile")
-  .addEventListener("change", importFromJsonFile);
-document
   .getElementById("categoryFilter")
   .addEventListener("change", filterQuotes);
 
 window.onload = function () {
+  fetchQuotesFromServer();
   showRandomQuote();
   createAddQuoteForm();
   populateCategories();
