@@ -145,6 +145,8 @@ function filterQuotes() {
   }
 }
 
+setInterval(syncQuotesToServer, 60000);
+
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document
   .getElementById("categoryFilter")
