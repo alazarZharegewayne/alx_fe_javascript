@@ -42,6 +42,7 @@ async function syncQuotesToServer() {
       },
       body: JSON.stringify(quotes),
     });
+    console.log("Quotes synced with server!"); // Logging the success message
   } catch (error) {
     console.error("Error syncing quotes:", error);
   }
