@@ -33,6 +33,20 @@ async function fetchQuotesFromServer() {
   }
 }
 
+async function syncQuotesToServer() {
+  try {
+    await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quotes),
+    });
+  } catch (error) {
+    console.error("Error syncing quotes:", error);
+  }
+}
+
 function showRandomQuote() {
   const quoteDisplay = document.getElementById("quoteDisplay");
   if (quotes.length === 0) {
@@ -85,6 +99,7 @@ function addQuote() {
 
   quotes.push(newQuote);
   saveQuotes();
+  syncQuotesToServer();
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
 
