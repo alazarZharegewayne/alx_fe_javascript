@@ -89,16 +89,26 @@ function exportToJsonFile() {
 }
 
 function importFromJsonFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
   const fileReader = new FileReader();
   fileReader.onload = function (event) {
-    const importedQuotes = JSON.parse(event.target.result);
-    quotes.push(...importedQuotes);
-    saveQuotes();
-    populateCategories();
-    alert("Quotes imported successfully!");
-    showRandomQuote();
+    try {
+      const importedQuotes = JSON.parse(event.target.result);
+      if (!Array.isArray(importedQuotes)) {
+        throw new Error("Invalid JSON format. Expected an array of quotes.");
+      }
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      populateCategories();
+      alert("Quotes imported successfully!");
+      showRandomQuote();
+    } catch (error) {
+      alert("Error importing quotes: " + error.message);
+    }
   };
-  fileReader.readAsText(event.target.files[0]);
+  fileReader.readAsText(file);
 }
 
 function populateCategories() {
