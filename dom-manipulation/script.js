@@ -99,29 +99,15 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-function createExportImportButtons() {
-  const exportButton = document.createElement("button");
-  exportButton.textContent = "Export Quotes to JSON";
-  exportButton.onclick = exportToJsonFile;
-
-  const importInput = document.createElement("input");
-  importInput.type = "file";
-  importInput.id = "importFile";
-  importInput.accept = ".json";
-  importInput.onchange = importFromJsonFile;
-
-  const importLabel = document.createElement("label");
-  importLabel.textContent = "Import Quotes from JSON";
-  importLabel.htmlFor = "importFile";
-
-  document.body.appendChild(exportButton);
-  document.body.appendChild(importLabel);
-  document.body.appendChild(importInput);
-}
-
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+document
+  .getElementById("exportQuotes")
+  .addEventListener("click", exportToJsonFile);
+document
+  .getElementById("importFile")
+  .addEventListener("change", importFromJsonFile);
+
 window.onload = function () {
   showRandomQuote();
   createAddQuoteForm();
-  createExportImportButtons();
 };
