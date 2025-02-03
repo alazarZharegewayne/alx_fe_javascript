@@ -1,26 +1,17 @@
 let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
 
-function fetchQuotesFromServer() {
-  const mockQuotes = [
-    {
-      text: "The only limit to our realization of tomorrow is our doubts of today.",
-      category: "Inspiration",
-    },
-    {
-      text: "Do what you can, with what you have, where you are.",
-      category: "Motivation",
-    },
-    {
-      text: "Strive not to be a success, but rather to be of value.",
-      category: "Success",
-    },
-  ];
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockQuotes);
-    }, 1000);
-  });
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    const data = await response.json();
+    return data.map((post) => ({
+      text: post.title,
+      category: "General",
+    }));
+  } catch (error) {
+    console.error("Error fetching quotes:", error);
+    return [];
+  }
 }
 
 async function loadQuotesFromServer() {
