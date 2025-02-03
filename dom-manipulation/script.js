@@ -1,51 +1,38 @@
-let quotes = JSON.parse(localStorage.getItem("quotes")) || [
-  {
-    text: "The only limit to our realization of tomorrow is our doubts of today.",
-    category: "Inspiration",
-  },
-  {
-    text: "Do what you can, with what you have, where you are.",
-    category: "Motivation",
-  },
-  {
-    text: "Strive not to be a success, but rather to be of value.",
-    category: "Success",
-  },
-];
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+function fetchQuotesFromServer() {
+  const mockQuotes = [
+    {
+      text: "The only limit to our realization of tomorrow is our doubts of today.",
+      category: "Inspiration",
+    },
+    {
+      text: "Do what you can, with what you have, where you are.",
+      category: "Motivation",
+    },
+    {
+      text: "Strive not to be a success, but rather to be of value.",
+      category: "Success",
+    },
+  ];
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockQuotes);
+    }, 1000);
+  });
+}
+
+async function loadQuotesFromServer() {
+  const serverQuotes = await fetchQuotesFromServer();
+  quotes = serverQuotes;
+  saveQuotes();
+  populateCategories();
+  showRandomQuote();
+}
 
 function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
-}
-
-async function fetchQuotesFromServer() {
-  try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    const data = await response.json();
-    const fetchedQuotes = data
-      .slice(0, 5)
-      .map((post) => ({ text: post.title, category: "General" }));
-    quotes.push(...fetchedQuotes);
-    saveQuotes();
-    populateCategories();
-    showRandomQuote();
-  } catch (error) {
-    console.error("Error fetching quotes:", error);
-  }
-}
-
-async function syncQuotesToServer() {
-  try {
-    await fetch("https://jsonplaceholder.typicode.com/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(quotes),
-    });
-    console.log("Quotes synced with server!"); // Logging the success message
-  } catch (error) {
-    console.error("Error syncing quotes:", error);
-  }
 }
 
 function showRandomQuote() {
@@ -100,13 +87,46 @@ function addQuote() {
 
   quotes.push(newQuote);
   saveQuotes();
-  syncQuotesToServer();
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
 
   alert("Quote added successfully!");
   populateCategories();
   showRandomQuote();
+}
+
+function exportToJsonFile() {
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "quotes.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function importFromJsonFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileReader = new FileReader();
+  fileReader.onload = function (event) {
+    try {
+      const importedQuotes = JSON.parse(event.target.result);
+      if (!Array.isArray(importedQuotes)) {
+        throw new Error("Invalid JSON format. Expected an array of quotes.");
+      }
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      populateCategories();
+      alert("Quotes imported successfully!");
+      showRandomQuote();
+    } catch (error) {
+      alert("Error importing quotes: " + error.message);
+    }
+  };
+  fileReader.readAsText(file);
 }
 
 function populateCategories() {
@@ -146,16 +166,18 @@ function filterQuotes() {
   }
 }
 
-setInterval(syncQuotesToServer, 60000);
-
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+document
+  .getElementById("exportQuotes")
+  .addEventListener("click", exportToJsonFile);
+document
+  .getElementById("importFile")
+  .addEventListener("change", importFromJsonFile);
 document
   .getElementById("categoryFilter")
   .addEventListener("change", filterQuotes);
 
 window.onload = function () {
-  fetchQuotesFromServer();
-  showRandomQuote();
+  loadQuotesFromServer();
   createAddQuoteForm();
-  populateCategories();
 };
