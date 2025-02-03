@@ -21,6 +21,22 @@ async function fetchQuotesFromServer() {
   }
 }
 
+async function syncQuotes() {
+  try {
+    const serverQuotes = await fetchQuotesFromServer();
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    const combinedQuotes = [...localQuotes, ...serverQuotes];
+    localStorage.setItem("quotes", JSON.stringify(combinedQuotes));
+    quotes = combinedQuotes;
+    populateCategories();
+    showRandomQuote();
+    alert("Quotes synchronized successfully!");
+  } catch (error) {
+    console.error("Error synchronizing quotes:", error);
+    alert("Failed to synchronize quotes.");
+  }
+}
+
 async function loadQuotesFromServer() {
   const serverQuotes = await fetchQuotesFromServer();
   quotes = serverQuotes;
@@ -62,9 +78,14 @@ function createAddQuoteForm() {
   addButton.textContent = "Add Quote";
   addButton.onclick = addQuote;
 
+  const syncButton = document.createElement("button");
+  syncButton.textContent = "Sync Quotes";
+  syncButton.onclick = syncQuotes;
+
   formContainer.appendChild(quoteInput);
   formContainer.appendChild(categoryInput);
   formContainer.appendChild(addButton);
+  formContainer.appendChild(syncButton);
 
   document.body.appendChild(formContainer);
 }
