@@ -184,7 +184,7 @@ function filterQuotes() {
     quoteDisplay.innerHTML = `<strong>${randomQuote.text}</strong><br><em>Category: ${randomQuote.category}</em>`;
   }
 }
-
+setInterval(syncQuotes, 60000); 
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document
   .getElementById("exportQuotes")
