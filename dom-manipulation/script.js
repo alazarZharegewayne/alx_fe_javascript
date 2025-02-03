@@ -30,7 +30,7 @@ async function syncQuotes() {
     quotes = combinedQuotes;
     populateCategories();
     showRandomQuote();
-    alert("Quotes synchronized successfully!");
+    alert("Quotes synced with server!");
   } catch (error) {
     console.error("Error synchronizing quotes:", error);
     alert("Failed to synchronize quotes.");
@@ -184,7 +184,10 @@ function filterQuotes() {
     quoteDisplay.innerHTML = `<strong>${randomQuote.text}</strong><br><em>Category: ${randomQuote.category}</em>`;
   }
 }
-setInterval(syncQuotes, 60000); 
+
+// Use setInterval to periodically synchronize quotes
+setInterval(syncQuotes, 60000); // Sync every 60 seconds
+
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document
   .getElementById("exportQuotes")
